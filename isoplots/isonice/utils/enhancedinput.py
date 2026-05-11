@@ -57,8 +57,8 @@ class EnhancedInput:
 
             with ui.element('div').classes('w-full bg-black shadow-lg rounded') as self.dropdown:
                 if self.animated:
-                    self.dropdown.classes('transition-all duration-500 overflow-hidden absolute left-0 top-14 z-50')
-                    self.dropdown.style('transform: scaleY(0); transform-origin: top;')
+                    self.dropdown.classes('transition-all duration-500 origin-top scale-y-0 overflow-hidden absolute left-0 top-14 z-50')
+                    # self.dropdown.style('transform: scaleY(0); transform-origin: top;')
 
                 if vertical:
                     with ui.splitter(value=10).classes('w-full h-full') as splitter:
@@ -98,7 +98,8 @@ class EnhancedInput:
                 with ui.tab_panel("Browse").classes("p-0"):
                     self.grid = ui.aggrid({
                         "columnDefs": [
-                            {"field": "path"}
+                            # {"field": "path"}
+                            {"headerName": "path", "field": "path"}
                         ],
                         "rowData": [{}]
                     }, theme="balham-dark"
@@ -208,22 +209,26 @@ class EnhancedInput:
         message : str
             Message to set
         """
+        self._error_message = message
         self.input.props(f'error error-message="{message}"')
-        self.input.update()
+        # self.input.update()
 
     def clear_error(self):
         """
         Clears the error message for the input
         """
-        # Get current props
-        current = self.input._props
-
-        # Remove 'error' and 'error-message="..."'
-        cleaned = re.sub(r'error-message="[^"]*"\s*', '', current)
-        cleaned = re.sub(r'\berror\b\s*', '', cleaned)
-
-        self.input.props(cleaned.strip())
-        self.input.update()
+        self._error_message = None
+        self.input.props("")
+        #
+        # # Get current props
+        # current = self.input._props
+        #
+        # # Remove 'error' and 'error-message="..."'
+        # cleaned = re.sub(r'error-message="[^"]*"\s*', '', current)
+        # cleaned = re.sub(r'\berror\b\s*', '', cleaned)
+        #
+        # self.input.props(cleaned.strip())
+        # # self.input.update()
 
     def set_tab(self, tab):
         """
@@ -309,13 +314,13 @@ class EnhancedInput:
         data = ["../"] + sorted(dirs) + sorted(files)
         auto = [f"{parent}{file}" for file in data]
 
-        self.input.set_autocomplete(auto)
+        # self.input.set_autocomplete(auto)
 
         if self._currTable != data:
             self._currTable = data
 
             self.grid.options['rowData'] = [{"path": file} for file in data]
-            self.grid.update()
+            # self.grid.update()
 
     def appendSearch(self, path):
         """
@@ -366,7 +371,8 @@ class EnhancedInput:
         if self.on_change and current != self._lastValue:
             self._lastValue = current
 
-            asyncio.create_task(self._wrap_on_change(current))
+            # asyncio.create_task(self._wrap_on_change(current))
+            ui.run_task(self._wrap_on_change(current))
 
     async def _wrap_on_change(self, value):
         """
@@ -377,8 +383,7 @@ class EnhancedInput:
             await result
 
 
-# For debugging purposes
-if __name__ in {"__main__", "__mp_main__"}:
+def _root():
     with ui.column().classes("w-[50vw]"):
         EnhancedInput("Options",
             default="Options",
@@ -392,4 +397,7 @@ if __name__ in {"__main__", "__mp_main__"}:
         EnhancedInput("Browse").classes("w-full")
         EnhancedInput("Not animated", animated=False).classes("w-full")
 
-    ui.run(dark=True)
+
+# For debugging purposes
+if __name__ in {"__main__", "__mp_main__"}:
+    ui.run(_root, dark=True)

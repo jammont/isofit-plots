@@ -20,21 +20,22 @@ Logger = logging.getLogger(__name__)
 Base = Path(__file__).parent.resolve()
 Static = Base / 'static'
 
-app.add_static_files('/static', str(Static))
-ui.add_head_html('''
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="/static/jse-theme-dark.css">
-''')
 
-# Makes top-level objects (like Tabs) use the full height of the screen
-ui.context.client.content.classes('h-screen')
+def root():
+    app.add_static_files('/static', str(Static))
+    ui.add_head_html('''
+        <link rel="stylesheet" href="/static/styles.css">
+        <link rel="stylesheet" href="/static/jse-theme-dark.css">
+    ''')
 
-dark = ui.dark_mode()
-dark.enable()
+    # Makes top-level objects (like Tabs) use the full height of the screen
+    ui.context.client.content.classes('h-screen')
 
+    dark = ui.dark_mode()
+    dark.enable()
 
-GUI = Tabs()
-app.on_startup(GUI.resetTabs)
+    GUI = Tabs()
+    GUI.resetTabs()
 
 
 def launch(path=".", config=None, check=False, **kwargs):
@@ -54,9 +55,9 @@ def launch(path=".", config=None, check=False, **kwargs):
         Logger.info("Checking ports")
         ports.checkPorts(kwargs.get("port", 8080))
 
-    if path:
-        Logger.info(f"Setting path: {path}")
-        GUI.tabs["Setup"].search.set_value(path)
+    # if path:
+    #     Logger.info(f"Setting path: {path}")
+    #     GUI.tabs["Setup"].search.set_value(path)
 
     if config is None:
         config = Static / "paths.ini"
@@ -66,7 +67,7 @@ def launch(path=".", config=None, check=False, **kwargs):
         Config.read(config)
 
     Logger.info("Launching")
-    ui.run(**kwargs)
+    ui.run(root, **kwargs)
 
 
 @click.command()

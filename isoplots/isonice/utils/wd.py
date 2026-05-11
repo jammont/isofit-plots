@@ -298,9 +298,12 @@ class FileFinder:
             Tree structure of discovered files. The keys are the directory names and
             the list values are the found files
         """
-        path = Path(path or self.path)
-        tree = tree if tree is not None else []
+        if not (path := (path or self.path)):
+            self.log.error("No path provided")
+            return []
 
+        path = Path(path)
+        tree = tree if tree is not None else []
         try:
             with os.scandir(path) as scan:
                 for item in scan:
@@ -335,9 +338,12 @@ class FileFinder:
         files : list[str]
             Flat list of matching file paths relative to base
         """
-        base = Path(path or self.path)
-        base_len = len(str(base)) + 1  # precompute for slicing
+        if not (path := (path or self.path)):
+            self.log.error("No path provided")
+            return []
 
+        base = Path(path)
+        base_len = len(str(base)) + 1  # precompute for slicing
         files = []
         try:
             for root, _, filenames in os.walk(base):
