@@ -1,6 +1,6 @@
 [project]
 name = "isoplots"
-version = "0.3.7"
+version = "0.3.10"
 description = "Plot Utilities for ISOFIT"
 readme = "README.rst"
 requires-python = ">=3.9"
